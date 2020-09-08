@@ -1,6 +1,7 @@
 const Register = require('../models/Register');
 const bcryptjs = require('bcryptjs');
 const { validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
 
 exports.registerUser = async(req, res) => {
     
@@ -15,7 +16,7 @@ exports.registerUser = async(req, res) => {
     
     try {
         let register = await Register.findOne({email});
-        console.log(register);
+        
         if(register) {
             return res.status(400).json({msg : 'El usuario ya existe'});
         }
@@ -29,7 +30,23 @@ exports.registerUser = async(req, res) => {
 
         // guardar en la base de datos
         await register.save(); 
-        await res.json({register});
+        
+        //Crear token y firmar JWT
+        const payload = {
+            user : {
+                id : register.id
+            }
+        };
+
+        // Firmar JWT
+        jwt.sign(payload, process.env.SECRET, {
+            expiresIn: 3600 // 1 hora
+        }, (error, token) => {
+            if(error) throw error;
+
+            //Enviar token
+            res.json({token});
+        })
 
     } catch (error) {
         console.log(error);

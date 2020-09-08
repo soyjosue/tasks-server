@@ -15,6 +15,8 @@ const port = process.env.PORT || 4000;
 
 // Importar las rutas
 app.use('/api/register', require('./routes/register-routes'));
+app.use('/api/login', require('./routes/login-router'));
+app.use('/api/tasks', require('./routes/tasks-router'));
 
 // Arrancar la app
 app.listen(port, '0.0.0.0', () => {
